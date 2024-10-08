@@ -1,0 +1,103 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "json/mosaic_data.json"
+  },
+  "transform": [
+    {
+      "calculate": "datum['Total Ballots'] / datum['Total Registered Voters'] * 100",
+      "as": "Ballots Percentage"
+    },
+    {
+      "calculate": "datum['Total Absent'] / datum['Total Registered Voters'] * 100",
+      "as": "Absent Percentage"
+    },
+    {
+      "fold": ["Ballots Percentage", "Absent Percentage"],
+      "as": ["Category", "Percentage"]
+    },
+    {
+      "window": [
+        {
+          "op": "sum",
+          "field": "Total Registered Voters",
+          "as": "Cumulative Electors"
+        }
+      ],
+      "sort": [
+        {
+          "field": "Elections",
+          "order": "ascending"
+        }
+      ]
+    },
+    {
+      "calculate": "datum['Cumulative Electors'] - datum['Total Registered Voters']",
+      "as": "Start Electors"
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "Start Electors",
+      "type": "quantitative",
+      "axis": {
+        "title": "Total Electors"
+      }
+    },
+    "x2": {
+      "field": "Cumulative Electors"
+    },
+    "y": {
+      "field": "Percentage",
+      "type": "quantitative",
+      "stack": "normalize",
+      "axis": {
+        "title": "Percentage"
+      }
+    },
+    "color": {
+      "field": "Category",
+      "type": "nominal",
+      "legend": {
+        "title": "Category"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "Elections",
+        "type": "nominal"
+      },
+      {
+        "field": "Total Registered Voters",
+        "type": "quantitative"
+      },
+      {
+        "field": "Total Ballots",
+        "type": "quantitative"
+      },
+      {
+        "field": "Total Absent",
+        "type": "quantitative"
+      },
+      {
+        "field": "Ballots Percentage",
+        "type": "quantitative"
+      },
+      {
+        "field": "Absent Percentage",
+        "type": "quantitative"
+      }
+    ]
+  },
+  "config": {
+    "view": {
+      "stroke": ""
+    },
+    "axis": {
+      "domain": false,
+      "ticks": false,
+      "grid": false
+    }
+  }
+}
